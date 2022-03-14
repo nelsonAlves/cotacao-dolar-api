@@ -42,10 +42,31 @@ para ter conhecimento do valor de compra e de venda do dolar naquela data especi
  CA-03. Se for uma data valida consultar as cotações do dolar em um serviço externo do Banco Central.
 
 # Teste
-## Cenário: 
- Consultar cotações do dolar por data válida.     
+## Cenários: 
+ 01: Consultar cotações do dolar por data válida.     
  Pré-requesitos: O usuário informar uma data válida.
  Procedimento: Consumir o serviço de consulta com uma data válida.   
- Resultado esperado: Responder a consulta com dados das cotações do dólar na data informada. Dados a serem retornados: Data da requisição, valor de compra, valor da venda, data e hora da cotação do dolar.
+ Resultado esperado: Responder a consulta com dados das cotações do dólar na data informada. 
+ Dados a serem retornados: Data da requisição, valor de compra, valor da venda, data e hora da cotação do dolar;
+ 
+ 02: Consultar cotações do dolar por data inválida.  
+ Pré-requesitos: O usuário informar a data inválida.  
+ Procedimento: Consumir o serviço de consulta de cotações com uma data inválida.  
+ Resultado esperado: Responder com uma mensagem de que a data informada está inválida.
+
+ 03: Consultar cotações do dolar por data com formato inválido.   
+ Pré-requesitos: O usuário informar a data com formato inválido.   
+ Procedimento: Consumir o serviço de consulta de cotações com uma data no formato inválido.   
+ Resultado esperado: Responder com uma mensagem de que a data informada está no formato inválido.   
+
+ 04: Consultar cotações do dolar quando o serviço externo do Banco Central estiver indisponivel.   
+ Pré-requesitos: O usuário informar uma data válida. Serviço do BC está indisponivel.    
+ Procedimento: Consumir o serviço de consulta de cotações que tentará consumir um serviço externo fornecido pelo Banco Central.   
+ Resultado esperado: Responder com uma mensagem de que o serviço do Banco Central está indisponivel. 
+
+ 05: Consultar cotações do dolar que não há registros de cotações na data válida informada.    
+ Pré-requesitos: O usuário informar uma data válida. Não ter nenhum registro de cotação para a data válida informada.   
+ Procedimento: Consumir o serviço de consulta com uma data válida.   
+ Resultado esperado: Responder com uma mensagem de que não há registros de cotação para a data informada.
 
 
