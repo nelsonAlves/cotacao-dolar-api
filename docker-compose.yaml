@@ -1,0 +1,94 @@
+version: "3"
+
+volumes:
+    prometheus_data: {}
+    grafana_data: {}
+
+services:
+
+  db-mysql:
+    container_name: db-mysql
+    image: mysql:5.6
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_cotacao_dolar    
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+    ports:
+      - "3306:33060"
+    networks:
+      - db-mysql-networks
+  
+  app-java:
+    build: .
+    restart: always
+    depends_on:
+      - db-mysql
+    networks:
+      - db-mysql-networks
+    ports:
+      - "8080:8081"
+    enviroment:
+         DATABASE_HOST: db-mysql
+         DATABASE_USER: root
+         DATABASE_PASSWORD: root
+         DATABASE_NAME: db_cotacao_dolar
+         DATABASE_PORT: 3306 
+    
+    networks:
+      db-mysql-networks:
+      driver: bridge
+      
+    jaeger:
+       container_name: jaeger_cotacao
+       image: jaegertracing/all-in-one:1.31
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
+      - "14250:14250"
+      - "9411:9411"
+    networks:
+      - cotacao
+      
+    prometheus:
+    container_name: prometheus_cotacao
+    image: prom/prometheus:latest
+    user: "1000:1000"
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - grafana_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    ports:
+      - 9090:9090
+    restart: always
+    networks:
+      - cotacao
+    
+    grafana:
+    container_name: grafana_cotacao
+    image: grafana/grafana
+    user: "1000:1000"
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    volumes:
+      - prometheus_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./src:/var/lib/grafana/dashboards
+    networks:
+      - cotacao
+
+    networks:
+        cotacao:
+        driver: bridgeee
